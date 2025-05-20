@@ -1,14 +1,18 @@
 extern crate native_windows_gui as nwg;
+mod config;
+mod notice;
+
 use nwg::WindowFlags;
 use std::rc::Rc;
+use std::cell::RefCell;
 use std::time::Duration;
-use winapi::um::winuser;
 use winapi::shared::windef;
+use winapi::um::winuser;
 
 // app name
 const APP_NAME: &str = "Dota2 Timer";
 // init time
-const INIT_TIME: &str = "-00:45";
+const INIT_TIME: &str = "-01:30";
 // start text
 const START_TEXT: &str = "START";
 // pause text
@@ -21,6 +25,8 @@ const CLEAR_TEXT: &str = "CLEAR";
 const FONT: &str = "Segoe UI";
 // icon resource name
 const ICON_NAME: &str = "MAINICON";
+// config dir name
+const CONFIG_DIR: &str = "config";
 // negative mark
 const NEGATIVE: &str = "-";
 // split mark
@@ -35,6 +41,7 @@ fn main_window() {
     nwg::init().expect("Failed to init Native Windows GUI");
     nwg::Font::set_global_family(FONT).expect("Failed to set default font");
 
+    let nodes = Rc::new(RefCell::new(vec![]));
     let mut window = Default::default();
     let mut timer_text = Default::default();
     let mut start_button = Default::default();
@@ -44,6 +51,7 @@ fn main_window() {
     let mut timer_font = Default::default();
     let mut icon = Default::default();
     let mut embed = Default::default();
+    let mut combo_box = Default::default();
     let layout = Default::default();
 
     nwg::EmbedResource::builder().build(&mut embed).unwrap();
@@ -89,6 +97,15 @@ fn main_window() {
         .build(&mut button_font)
         .unwrap();
 
+    // combo box
+    nwg::ComboBox::builder()
+        .parent(&window)
+        .font(Some(&button_font))
+        .collection(config::get_text_list(CONFIG_DIR))
+        .selected_index(Some(0))
+        .build(&mut combo_box)
+        .unwrap();
+
     nwg::Button::builder()
         .text(START_TEXT)
         .parent(&window)
@@ -124,8 +141,9 @@ fn main_window() {
         .parent(&window)
         .spacing(1)
         .child(0, 0, &timer_text)
-        .child_item(nwg::GridLayoutItem::new(&start_button, 0, 1, 1, 1))
-        .child_item(nwg::GridLayoutItem::new(&clear_button, 0, 1, 1, 1))
+        .child_item(nwg::GridLayoutItem::new(&combo_box, 0, 1, 1, 1))
+        .child_item(nwg::GridLayoutItem::new(&start_button, 0, 2, 1, 1))
+        .child_item(nwg::GridLayoutItem::new(&clear_button, 0, 2, 1, 1))
         .build(&layout)
         .unwrap();
 
@@ -145,9 +163,27 @@ fn main_window() {
             E::OnButtonClick => {
                 if &handle == &start_button {
                     click_start_button(&start_button, &timer, &timer_text, &clear_button);
+                    // get selected config
+                    let selected = combo_box.selection_string();
+                    let config = config::get_notice_config_list(selected);
+                    let mut nodes_ref = nodes.borrow_mut();
+                    nodes_ref.extend(notice::gen_notice_node(config));
                 }
                 if &handle == &clear_button {
                     click_clear_button(&timer, &timer_text, &start_button, &clear_button);
+                }
+            }
+            E::OnMousePress(mouse_event) => {
+                // click combo box change selection
+                if &handle == &combo_box && mouse_event == nwg::MousePressEvent::MousePressLeftDown
+                {
+                    let list = combo_box.collection();
+                    let index = combo_box.selection().unwrap_or(0) + 1;
+                    if index > list.len() - 1 {
+                        combo_box.set_selection(Some(0));
+                    } else {
+                        combo_box.set_selection(Some(index));
+                    }
                 }
             }
             E::OnTimerTick => {
@@ -160,13 +196,18 @@ fn main_window() {
                     // every 2 seconds, hide button
                     if timestamp % 2 == 0 {
                         start_button.set_visible(false);
+                        combo_box.set_visible(false);
                     }
+
+                    // control visibility
+                    control_nodes_visibility(&nodes.borrow(), timestamp);
                 }
             }
             E::OnMouseMove => {
                 // show button when mouse into window
                 if &handle == &events_window as &nwg::Window {
                     start_button.set_visible(true);
+                    combo_box.set_visible(true);
                 }
             }
             _ => {}
@@ -228,6 +269,29 @@ fn click_clear_button(
     let (_, y) = start_button.size();
     start_button.set_size(x, y);
     clear_button.set_visible(false);
+}
+
+/// control visibility
+fn control_nodes_visibility(nodes: &Vec<notice::NoticeNode>, timestamp: i32) {
+    let mut visible_count = 0;
+
+    // todo delete
+    println!("==================");
+
+    for node in nodes {
+        // just show 2 visible nodes
+        if timestamp <= node.timestamp && visible_count < 2 && node.visible {
+            visible_count += 1;
+            // todo show text label
+            println!("{}  {}", format(timestamp - node.timestamp), node.text);
+        }
+
+        // play notice sound
+        if timestamp == node.timestamp && !node.visible {
+            // todo play sound
+            println!("{}  {}-{}", format(timestamp), node.text, "notice");
+        }
+    }
 }
 
 /// format timestamp

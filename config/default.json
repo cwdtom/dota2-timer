@@ -1,0 +1,34 @@
+[
+    {
+        "period": -1,
+        "text": "出兵",
+        "start_time": 0,
+        "end_time": 0,
+        "repeat_count": 1,
+        "early_notice_time": 10
+    },
+    {
+        "period": 120,
+        "text": "神符刷新",
+        "start_time": 0,
+        "end_time": 1800,
+        "repeat_count": -1,
+        "early_notice_time": 15
+    },
+    {
+        "period": 180,
+        "text": "莲花生成",
+        "start_time": 180,
+        "end_time": -1,
+        "repeat_count": 5,
+        "early_notice_time": 20
+    },
+    {
+        "period": 420,
+        "text": "经验神符",
+        "start_time": 0,
+        "end_time": -1,
+        "repeat_count": -1,
+        "early_notice_time": 20
+    }
+]

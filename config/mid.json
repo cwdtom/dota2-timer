@@ -1,0 +1,26 @@
+[
+    {
+        "period": -1,
+        "text": "出兵",
+        "start_time": 0,
+        "end_time": 0,
+        "repeat_count": 1,
+        "early_notice_time": 10
+    },
+    {
+        "period": 120,
+        "text": "神符刷新",
+        "start_time": 0,
+        "end_time": 1800,
+        "repeat_count": -1,
+        "early_notice_time": 15
+    },
+    {
+        "period": -1,
+        "text": "补假眼",
+        "start_time": 300,
+        "end_time": 300,
+        "repeat_count": 1,
+        "early_notice_time": 0
+    }
+]
