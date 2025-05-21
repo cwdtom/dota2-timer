@@ -187,7 +187,13 @@ fn main_window() {
             }
             E::OnButtonClick => {
                 if &handle == &start_button {
-                    click_start_button(&start_button, &timer, &timer_text, &clear_button);
+                    click_start_button(
+                        &start_button,
+                        &timer,
+                        &timer_text,
+                        &clear_button,
+                        &combo_box,
+                    );
                     // get selected config
                     let selected = combo_box.selection_string();
                     let config = config::get_notice_config_list(selected);
@@ -195,7 +201,13 @@ fn main_window() {
                     *nodes_ref = notice::gen_notice_node(config);
                 }
                 if &handle == &clear_button {
-                    click_clear_button(&timer, &timer_text, &start_button, &clear_button);
+                    click_clear_button(
+                        &timer,
+                        &timer_text,
+                        &start_button,
+                        &clear_button,
+                        &combo_box,
+                    );
                 }
             }
             E::OnMousePress(mouse_event) => {
@@ -214,26 +226,12 @@ fn main_window() {
             E::OnTimerTick => {
                 if &handle == &timer {
                     let mut timestamp = to_timestamp(timer_text.text());
-
                     timestamp += 1;
                     timer_text.set_text(format(timestamp).as_str());
-
-                    // every 2 seconds, hide button
-                    if timestamp % 2 == 0 {
-                        start_button.set_visible(false);
-                        combo_box.set_visible(false);
-                    }
 
                     // control visibility
                     let node_text_arr: [&nwg::TextInput; 2] = [&node_text1, &node_text2];
                     control_nodes_visibility(&nodes.borrow(), timestamp, node_text_arr);
-                }
-            }
-            E::OnMouseMove => {
-                // show button when mouse into window
-                if &handle == &events_window as &nwg::Window {
-                    start_button.set_visible(true);
-                    combo_box.set_visible(true);
                 }
             }
             _ => {}
@@ -250,6 +248,7 @@ fn click_start_button(
     timer: &nwg::AnimationTimer,
     timer_text: &nwg::TextInput,
     clear_button: &nwg::Button,
+    combo_box: &nwg::ComboBox<String>,
 ) {
     if start_button.text() == PAUSE_TEXT {
         timer.stop();
@@ -272,6 +271,7 @@ fn click_start_button(
         let (_, y) = start_button.size();
         start_button.set_size(x, y);
         clear_button.set_visible(false);
+        combo_box.set_enabled(false);
     }
 }
 
@@ -281,6 +281,7 @@ fn click_clear_button(
     timer_text: &nwg::TextInput,
     start_button: &nwg::Button,
     clear_button: &nwg::Button,
+    combo_box: &nwg::ComboBox<String>,
 ) {
     // stop timer
     timer.stop();
@@ -295,6 +296,7 @@ fn click_clear_button(
     let (_, y) = start_button.size();
     start_button.set_size(x, y);
     clear_button.set_visible(false);
+    combo_box.set_enabled(true);
 }
 
 /// control visibility
@@ -309,9 +311,11 @@ fn control_nodes_visibility(
         // just show 2 visible nodes
         if timestamp <= node.timestamp && visible_index < 2 && node.visible {
             // show text
-            node_text_arr[visible_index].set_text(
-                format!("{} {}", format(timestamp - node.timestamp), node.text).as_str(),
-            );
+            let mut time_str = format(timestamp - node.timestamp);
+            if !time_str.starts_with(NEGATIVE) {
+                time_str = format!("-{}", time_str);
+            }
+            node_text_arr[visible_index].set_text(format!("{} {}", time_str, node.text).as_str());
 
             visible_index += 1;
         }

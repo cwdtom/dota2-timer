@@ -19,6 +19,7 @@ pub fn gen_notice_node(config: Vec<NoticeConfig>) -> Vec<NoticeNode> {
 
     for c in &config {
         let start = c.start_time;
+        let early_notice_time = c.early_notice_time;
         // negative number means no limit
         let mut end = c.end_time;
         if end < 0 {
@@ -31,10 +32,6 @@ pub fn gen_notice_node(config: Vec<NoticeConfig>) -> Vec<NoticeNode> {
         let mut repeat_count = c.repeat_count;
         if repeat_count < 0 {
             repeat_count = MAX_VALUE;
-        }
-        let mut early_notice_time = c.early_notice_time;
-        if early_notice_time < 0 {
-            early_notice_time = MAX_VALUE;
         }
 
         // gen count
@@ -51,12 +48,15 @@ pub fn gen_notice_node(config: Vec<NoticeConfig>) -> Vec<NoticeNode> {
                 visible: true,
             };
             // gen invisible node, just notice
-            let invisible = NoticeNode {
-                timestamp: cur - early_notice_time,
-                text: c.text.clone(),
-                visible: false,
-            };
-            nodes.push(invisible);
+            if early_notice_time > 0 {
+                let invisible = NoticeNode {
+                    timestamp: cur - early_notice_time,
+                    text: c.text.clone(),
+                    visible: false,
+                };
+                nodes.push(invisible);
+            }
+
             nodes.push(visible);
             gen_count += 1;
         }
