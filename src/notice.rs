@@ -1,7 +1,9 @@
 use crate::config::NoticeConfig;
 
-// max value
-const MAX_VALUE: i32 = 600;
+// time max value
+const TIME_MAX_VALUE: i32 = 18000;
+// repeat max value
+const REPEAT_MAX_VALUE: i32 = 300;
 
 /// notice node
 pub struct NoticeNode {
@@ -22,16 +24,16 @@ pub fn gen_notice_node(config: Vec<NoticeConfig>) -> Vec<NoticeNode> {
         let early_notice_time = c.early_notice_time;
         // negative number means no limit
         let mut end = c.end_time;
-        if end < 0 {
-            end = MAX_VALUE;
+        if end < 0 || end > TIME_MAX_VALUE {
+            end = TIME_MAX_VALUE;
         }
         let mut period = c.period;
-        if period < 0 {
-            period = MAX_VALUE;
+        if period <= 0 || period > TIME_MAX_VALUE {
+            period = TIME_MAX_VALUE;
         }
         let mut repeat_count = c.repeat_count;
-        if repeat_count < 0 {
-            repeat_count = MAX_VALUE;
+        if repeat_count < 0 || repeat_count > REPEAT_MAX_VALUE {
+            repeat_count = REPEAT_MAX_VALUE;
         }
 
         // gen count
