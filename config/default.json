@@ -9,15 +9,15 @@
     },
     {
         "period": 120,
-        "text": "神符刷新",
-        "start_time": 0,
+        "text": "功能神符",
+        "start_time": 360,
         "end_time": 1800,
         "repeat_count": -1,
         "early_notice_time": 15
     },
     {
         "period": 180,
-        "text": "莲花生成",
+        "text": "莲花",
         "start_time": 180,
         "end_time": -1,
         "repeat_count": 5,
@@ -25,10 +25,26 @@
     },
     {
         "period": 420,
-        "text": "经验神符",
-        "start_time": 0,
+        "text": "经验神龛",
+        "start_time": 420,
         "end_time": -1,
         "repeat_count": -1,
+        "early_notice_time": 20
+    },
+    {
+        "period": 240,
+        "text": "赏金神符",
+        "start_time": 0,
+        "end_time": 3600,
+        "repeat_count": -1,
+        "early_notice_time": 20
+    },
+    {
+        "period": 900,
+        "text": "痛苦魔方",
+        "start_time": 900,
+        "end_time": -1,
+        "repeat_count": 1,
         "early_notice_time": 20
     }
 ]

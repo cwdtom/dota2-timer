@@ -3,8 +3,8 @@ mod config;
 mod notice;
 
 use nwg::WindowFlags;
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 use std::time::Duration;
 use winapi::shared::windef;
 use winapi::um::winuser;
@@ -167,7 +167,7 @@ fn main_window() {
                     let selected = combo_box.selection_string();
                     let config = config::get_notice_config_list(selected);
                     let mut nodes_ref = nodes.borrow_mut();
-                    nodes_ref.extend(notice::gen_notice_node(config));
+                    *nodes_ref = notice::gen_notice_node(config);
                 }
                 if &handle == &clear_button {
                     click_clear_button(&timer, &timer_text, &start_button, &clear_button);
@@ -288,8 +288,9 @@ fn control_nodes_visibility(nodes: &Vec<notice::NoticeNode>, timestamp: i32) {
 
         // play notice sound
         if timestamp == node.timestamp && !node.visible {
-            // todo play sound
-            println!("{}  {}-{}", format(timestamp), node.text, "notice");
+            unsafe {
+                winapi::um::winuser::MessageBeep(0x00000010);
+            }
         }
     }
 }

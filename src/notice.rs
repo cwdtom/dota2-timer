@@ -18,11 +18,8 @@ pub fn gen_notice_node(config: Vec<NoticeConfig>) -> Vec<NoticeNode> {
     let mut nodes = vec![];
 
     for c in &config {
+        let start = c.start_time;
         // negative number means no limit
-        let mut start = c.start_time;
-        if start < 0 {
-            start = MAX_VALUE;
-        }
         let mut end = c.end_time;
         if end < 0 {
             end = MAX_VALUE;
@@ -43,7 +40,7 @@ pub fn gen_notice_node(config: Vec<NoticeConfig>) -> Vec<NoticeNode> {
         // gen count
         let mut gen_count = 0;
         for cur in (start..=end).step_by(period as usize) {
-            if gen_count > repeat_count {
+            if gen_count >= repeat_count {
                 break;
             }
 

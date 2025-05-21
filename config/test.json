@@ -16,12 +16,20 @@
         "early_notice_time": 15
     },
     {
-        "period": -1,
-        "text": "补假眼",
-        "start_time": 300,
-        "end_time": 300,
-        "repeat_count": 1,
-        "early_notice_time": 0
+        "period": 180,
+        "text": "莲花",
+        "start_time": 180,
+        "end_time": -1,
+        "repeat_count": 5,
+        "early_notice_time": 20
+    },
+    {
+        "period": 420,
+        "text": "经验神龛",
+        "start_time": 420,
+        "end_time": -1,
+        "repeat_count": -1,
+        "early_notice_time": 20
     },
     {
         "period": 240,
@@ -40,11 +48,11 @@
         "early_notice_time": 20
     },
     {
-        "period": 420,
-        "text": "经验神龛",
-        "start_time": 420,
+        "period": 2,
+        "text": "test sound",
+        "start_time": -90,
         "end_time": -1,
         "repeat_count": -1,
-        "early_notice_time": 20
+        "early_notice_time": 0
     }
 ]
