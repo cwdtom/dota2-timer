@@ -9,6 +9,14 @@
     },
     {
         "period": 120,
+        "text": "圣水神符",
+        "start_time": 120,
+        "end_time": 240,
+        "repeat_count": 2,
+        "early_notice_time": 15
+    },
+    {
+        "period": 120,
         "text": "功能神符",
         "start_time": 360,
         "end_time": 1800,

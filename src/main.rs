@@ -15,7 +15,7 @@ use winapi::um::winuser;
 // app name
 const APP_NAME: &str = "Dota2 Timer";
 // init time
-const INIT_TIME: &str = "-01:30";
+const INIT_TIME: &str = "-01:25";
 // start text
 const START_TEXT: &str = "START";
 // pause text

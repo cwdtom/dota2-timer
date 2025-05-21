@@ -1,9 +1,12 @@
 # Dota2 Timer
 
-![Version](https://img.shields.io/badge/version-0.9.1-green.svg)
+![Version](https://img.shields.io/badge/version-0.9.2-green.svg)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](http://opensource.org/licenses/MIT)
 
 # Overview
 - 基于Rust的Dota2计时提醒工具。
+
+![example](example/example.png)
 
 # Quick Start
 ## 1. 程序目录结构
@@ -47,3 +50,7 @@
 | end_time | 数字（秒） | 触发结束时间 | 不能小于-90，-1代表5小时 |
 | repeat_count | 数字（次） | 触发最大次数 | -1代表300次 |
 | early_notice_time | 数字（秒） | 提前多少时间提醒 | -1代表不提醒 |
+
+# Todo List
+
+1. 买活时间记录并提醒。
