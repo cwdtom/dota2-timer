@@ -2,6 +2,7 @@ extern crate native_windows_gui as nwg;
 mod config;
 mod notice;
 
+use nwg::TextInputFlags;
 use nwg::WindowFlags;
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -52,6 +53,8 @@ fn main_window() {
     let mut icon = Default::default();
     let mut embed = Default::default();
     let mut combo_box = Default::default();
+    let mut node_text1 = Default::default();
+    let mut node_text2 = Default::default();
     let layout = Default::default();
 
     nwg::EmbedResource::builder().build(&mut embed).unwrap();
@@ -65,7 +68,7 @@ fn main_window() {
 
     // main window
     nwg::Window::builder()
-        .size((150, 115))
+        .size((150, 165))
         .position((300, 300))
         .title(APP_NAME)
         .topmost(true)
@@ -129,6 +132,26 @@ fn main_window() {
         .build(&mut timer)
         .unwrap();
 
+    // 1 node performance
+    nwg::TextInput::builder()
+        .text(NEGATIVE)
+        .font(Some(&button_font))
+        .limit(13)
+        .flags(TextInputFlags::DISABLED | TextInputFlags::VISIBLE)
+        .parent(&window)
+        .build(&mut node_text1)
+        .unwrap();
+
+    // 2 node performance
+    nwg::TextInput::builder()
+        .text(NEGATIVE)
+        .font(Some(&button_font))
+        .limit(13)
+        .flags(TextInputFlags::DISABLED | TextInputFlags::VISIBLE)
+        .parent(&window)
+        .build(&mut node_text2)
+        .unwrap();
+
     // set transparency
     unsafe {
         // Set 60% transparency (153 out of 255)
@@ -141,9 +164,11 @@ fn main_window() {
         .parent(&window)
         .spacing(1)
         .child(0, 0, &timer_text)
-        .child_item(nwg::GridLayoutItem::new(&combo_box, 0, 1, 1, 1))
-        .child_item(nwg::GridLayoutItem::new(&start_button, 0, 2, 1, 1))
-        .child_item(nwg::GridLayoutItem::new(&clear_button, 0, 2, 1, 1))
+        .child_item(nwg::GridLayoutItem::new(&combo_box, 0, 3, 1, 1))
+        .child_item(nwg::GridLayoutItem::new(&start_button, 0, 4, 1, 1))
+        .child_item(nwg::GridLayoutItem::new(&clear_button, 0, 4, 1, 1))
+        .child_item(nwg::GridLayoutItem::new(&node_text1, 0, 1, 1, 1))
+        .child_item(nwg::GridLayoutItem::new(&node_text2, 0, 2, 1, 1))
         .build(&layout)
         .unwrap();
 
@@ -200,7 +225,8 @@ fn main_window() {
                     }
 
                     // control visibility
-                    control_nodes_visibility(&nodes.borrow(), timestamp);
+                    let node_text_arr: [&nwg::TextInput; 2] = [&node_text1, &node_text2];
+                    control_nodes_visibility(&nodes.borrow(), timestamp, node_text_arr);
                 }
             }
             E::OnMouseMove => {
@@ -272,25 +298,30 @@ fn click_clear_button(
 }
 
 /// control visibility
-fn control_nodes_visibility(nodes: &Vec<notice::NoticeNode>, timestamp: i32) {
-    let mut visible_count = 0;
-
-    // todo delete
-    println!("==================");
-
+fn control_nodes_visibility(
+    nodes: &Vec<notice::NoticeNode>,
+    timestamp: i32,
+    node_text_arr: [&nwg::TextInput; 2],
+) {
+    let mut visible_index: usize = 0;
+    let mut played_sound: bool = false;
     for node in nodes {
         // just show 2 visible nodes
-        if timestamp <= node.timestamp && visible_count < 2 && node.visible {
-            visible_count += 1;
-            // todo show text label
-            println!("{}  {}", format(timestamp - node.timestamp), node.text);
+        if timestamp <= node.timestamp && visible_index < 2 && node.visible {
+            // show text
+            node_text_arr[visible_index].set_text(
+                format!("{} {}", format(timestamp - node.timestamp), node.text).as_str(),
+            );
+
+            visible_index += 1;
         }
 
         // play notice sound
-        if timestamp == node.timestamp && !node.visible {
+        if timestamp == node.timestamp && !node.visible && !played_sound {
             unsafe {
                 winapi::um::winuser::MessageBeep(0x00000010);
             }
+            played_sound = true;
         }
     }
 }
